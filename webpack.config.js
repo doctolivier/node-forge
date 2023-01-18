@@ -67,13 +67,6 @@ outputs.forEach(info => {
     entry: {
       forge: info.entry
     },
-    // disable various node shims as forge handles this manually
-    node: {
-      Buffer: false,
-      process: false,
-      crypto: false,
-      setImmediate: false
-    }
   };
 
   // plain unoptimized unminified bundle
@@ -86,10 +79,10 @@ outputs.forEach(info => {
       libraryTarget: info.libraryTarget || 'umd'
     }
   });
-  if(info.library === null) {
+  if (info.library === null) {
     delete bundle.output.library;
   }
-  if(info.libraryTarget === null) {
+  if (info.libraryTarget === null) {
     delete bundle.output.libraryTarget;
   }
 
@@ -118,10 +111,10 @@ outputs.forEach(info => {
       */
     ]
   });
-  if(info.library === null) {
+  if (info.library === null) {
     delete minify.output.library;
   }
-  if(info.libraryTarget === null) {
+  if (info.libraryTarget === null) {
     delete minify.output.libraryTarget;
   }
 
