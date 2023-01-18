@@ -6,7 +6,7 @@ var AES = require('../../lib/aes');
 var DES = require('../../lib/des');
 var UTIL = require('../../lib/util');
 
-(function() {
+(function () {
   var _pem = {
     p7:
       '-----BEGIN PKCS7-----\r\n' +
@@ -412,8 +412,8 @@ var UTIL = require('../../lib/util');
       '-----END PKCS7-----\r\n'
   };
 
-  describe('pkcs7', function() {
-    it('should import message from PEM', function() {
+  describe('pkcs7', function () {
+    it('should import message from PEM', function () {
       var p7 = PKCS7.messageFromPem(_pem.p7);
 
       ASSERT.equal(p7.type, PKI.oids.envelopedData);
@@ -447,8 +447,8 @@ var UTIL = require('../../lib/util');
       ASSERT.equal(p7.encryptedContent.parameter.data.length, 16); // IV
     });
 
-    it('should import indefinite length message from PEM', function() {
-      ASSERT.doesNotThrow(function() {
+    it('should import indefinite length message from PEM', function () {
+      ASSERT.doesNotThrow(function () {
         var p7 = PKCS7.messageFromPem(_pem.p7IndefiniteLength);
         ASSERT.equal(p7.type, PKI.oids.envelopedData);
         ASSERT.equal(p7.encryptedContent.parameter.toHex(), '536da6a06653733d');
@@ -456,12 +456,12 @@ var UTIL = require('../../lib/util');
       });
     });
 
-    it('should import a message with no certificate', function() {
+    it('should import a message with no certificate', function () {
       var p7 = PKCS7.messageFromPem(_pem.signedDataWithNoCertificate);
       ASSERT.equal(p7.type, PKI.oids.signedData);
     });
 
-    it('should find recipient by serial number', function() {
+    it('should find recipient by serial number', function () {
       var p7 = PKCS7.messageFromPem(_pem.p7);
       var cert = PKI.certificateFromPem(_pem.certificate);
 
@@ -474,7 +474,7 @@ var UTIL = require('../../lib/util');
       ASSERT.equal(ri, null);
     });
 
-    it('should aes-decrypt message', function() {
+    it('should aes-decrypt message', function () {
       var p7 = PKCS7.messageFromPem(_pem.p7);
       var privateKey = PKI.privateKeyFromPem(_pem.privateKey);
       p7.decrypt(p7.recipients[0], privateKey);
@@ -486,7 +486,7 @@ var UTIL = require('../../lib/util');
         'Today is Boomtime, the 9th day of Discord in the YOLD 3178\r\n');
     });
 
-    it('should 3des-decrypt message', function() {
+    it('should 3des-decrypt message', function () {
       var p7 = PKCS7.messageFromPem(_pem.p73des);
       var privateKey = PKI.privateKeyFromPem(_pem.privateKey);
       p7.decrypt(p7.recipients[0], privateKey);
@@ -499,7 +499,7 @@ var UTIL = require('../../lib/util');
         'the 16th day of Discord in the YOLD 3178\r\n');
     });
 
-    it('should add a recipient', function() {
+    it('should add a recipient', function () {
       var p7 = PKCS7.createEnvelopedData();
 
       // initially there should be no recipients
@@ -514,7 +514,7 @@ var UTIL = require('../../lib/util');
       ASSERT.deepEqual(p7.recipients[0].encryptedContent.key, cert.publicKey);
     });
 
-    it('should aes-encrypt a message', function() {
+    it('should aes-encrypt a message', function () {
       var p7 = PKCS7.createEnvelopedData();
       var cert = PKI.certificateFromPem(_pem.certificate);
       var privateKey = PKI.privateKeyFromPem(_pem.privateKey);
@@ -557,7 +557,7 @@ var UTIL = require('../../lib/util');
       ASSERT.equal(ciph.output, 'Just a little test');
     });
 
-    it('should 3des-ede-encrypt a message', function() {
+    it('should 3des-ede-encrypt a message', function () {
       var p7 = PKCS7.createEnvelopedData();
       var cert = PKI.certificateFromPem(_pem.certificate);
       var privateKey = PKI.privateKeyFromPem(_pem.privateKey);
@@ -598,7 +598,7 @@ var UTIL = require('../../lib/util');
       ASSERT.equal(ciph.output, 'Just a little test');
     });
 
-    it('should export message to PEM', function() {
+    it('should export message to PEM', function () {
       var p7 = PKCS7.createEnvelopedData();
       p7.addRecipient(PKI.certificateFromPem(_pem.certificate));
       p7.content = UTIL.createBuffer('Just a little test');
@@ -612,12 +612,12 @@ var UTIL = require('../../lib/util');
       ASSERT.equal(p7.content, 'Just a little test');
     });
 
-    it('should decrypt encrypted data from PEM', function() {
+    it('should decrypt encrypted data from PEM', function () {
       var result = '1f8b08000000000000000b2e494d4bcc5308ce4c4dcfd15130b0b430d4b7343732b03437d05170cc2b4e4a4cced051b034343532d25170492d2d294ecec849cc4b0100bf52f02437000000';
       var key = 'b96e4a4c0a3555d31e1b295647cc5cfe74081918cb7f797b';
       key = UTIL.createBuffer(UTIL.hexToBytes(key));
 
-      ASSERT.doesNotThrow(function() {
+      ASSERT.doesNotThrow(function () {
         var p7 = PKCS7.messageFromPem(_pem.encryptedData);
         ASSERT.equal(p7.type, PKI.oids.encryptedData);
         ASSERT.equal(p7.encryptedContent.algorithm, PKI.oids['des-EDE3-CBC']);
@@ -629,14 +629,14 @@ var UTIL = require('../../lib/util');
       });
     });
 
-    it('should create a degenerate PKCS#7 certificate container', function() {
+    it('should create a degenerate PKCS#7 certificate container', function () {
       var p7 = PKCS7.createSignedData();
       p7.addCertificate(_pem.certificate);
       var pem = PKCS7.messageToPem(p7);
       ASSERT.equal(pem, _pem.degenerateP7);
     });
 
-    it('should create PKCS#7 SignedData with no attributes', function() {
+    it('should create PKCS#7 SignedData with no attributes', function () {
       // verify with:
       // openssl smime -verify -in p7.pem -signer certificate.pem \
       //   -out signedtext.txt -inform PEM -CAfile certificate.pem
@@ -654,64 +654,64 @@ var UTIL = require('../../lib/util');
     });
 
     it('should create PKCS#7 SignedData with content-type, message-digest, ' +
-      'and signing-time attributes using GeneralizedTime (1949)', function() {
-      // verify with:
-      // openssl smime -verify -in p7.pem -signer certificate.pem \
-      //   -out signedtext.txt -inform PEM -CAfile certificate.pem
-      var p7 = PKCS7.createSignedData();
-      p7.content = UTIL.createBuffer('To be signed.', 'utf8');
-      p7.addCertificate(_pem.certificate);
-      p7.addSigner({
-        key: PKI.privateKeyFromPem(_pem.privateKey),
-        certificate: _pem.certificate,
-        digestAlgorithm: PKI.oids.sha256,
-        authenticatedAttributes: [{
-          type: forge.pki.oids.contentType,
-          value: forge.pki.oids.data
-        }, {
-          type: forge.pki.oids.messageDigest
-          // value will be auto-populated at signing time
-        }, {
-          type: forge.pki.oids.signingTime,
-          // will be encoded as generalized time because it's before 1950
-          value: new Date('1949-12-31T23:59:59Z')
-        }]
+      'and signing-time attributes using GeneralizedTime (1949)', function () {
+        // verify with:
+        // openssl smime -verify -in p7.pem -signer certificate.pem \
+        //   -out signedtext.txt -inform PEM -CAfile certificate.pem
+        var p7 = PKCS7.createSignedData();
+        p7.content = UTIL.createBuffer('To be signed.', 'utf8');
+        p7.addCertificate(_pem.certificate);
+        p7.addSigner({
+          key: PKI.privateKeyFromPem(_pem.privateKey),
+          certificate: _pem.certificate,
+          digestAlgorithm: PKI.oids.sha256,
+          authenticatedAttributes: [{
+            type: forge.pki.oids.contentType,
+            value: forge.pki.oids.data
+          }, {
+            type: forge.pki.oids.messageDigest
+            // value will be auto-populated at signing time
+          }, {
+            type: forge.pki.oids.signingTime,
+            // will be encoded as generalized time because it's before 1950
+            value: new Date('1949-12-31T23:59:59Z')
+          }]
+        });
+        p7.sign();
+        var pem = PKCS7.messageToPem(p7);
+        ASSERT.equal(pem, _pem.signedDataWithAttrs1949GeneralizedTime);
       });
-      p7.sign();
-      var pem = PKCS7.messageToPem(p7);
-      ASSERT.equal(pem, _pem.signedDataWithAttrs1949GeneralizedTime);
-    });
 
     it('should create PKCS#7 SignedData with content-type, message-digest, ' +
-      'and signing-time attributes using UTCTime (1950)', function() {
-      // verify with:
-      // openssl smime -verify -in p7.pem -signer certificate.pem \
-      //   -out signedtext.txt -inform PEM -CAfile certificate.pem
-      var p7 = PKCS7.createSignedData();
-      p7.content = UTIL.createBuffer('To be signed.', 'utf8');
-      p7.addCertificate(_pem.certificate);
-      p7.addSigner({
-        key: PKI.privateKeyFromPem(_pem.privateKey),
-        certificate: _pem.certificate,
-        digestAlgorithm: PKI.oids.sha256,
-        authenticatedAttributes: [{
-          type: forge.pki.oids.contentType,
-          value: forge.pki.oids.data
-        }, {
-          type: forge.pki.oids.messageDigest
-          // value will be auto-populated at signing time
-        }, {
-          type: forge.pki.oids.signingTime,
-          // will be encoded as UTC time because it's >= 1950
-          value: new Date('1950-01-01T00:00:00Z')
-        }]
+      'and signing-time attributes using UTCTime (1950)', function () {
+        // verify with:
+        // openssl smime -verify -in p7.pem -signer certificate.pem \
+        //   -out signedtext.txt -inform PEM -CAfile certificate.pem
+        var p7 = PKCS7.createSignedData();
+        p7.content = UTIL.createBuffer('To be signed.', 'utf8');
+        p7.addCertificate(_pem.certificate);
+        p7.addSigner({
+          key: PKI.privateKeyFromPem(_pem.privateKey),
+          certificate: _pem.certificate,
+          digestAlgorithm: PKI.oids.sha256,
+          authenticatedAttributes: [{
+            type: forge.pki.oids.contentType,
+            value: forge.pki.oids.data
+          }, {
+            type: forge.pki.oids.messageDigest
+            // value will be auto-populated at signing time
+          }, {
+            type: forge.pki.oids.signingTime,
+            // will be encoded as UTC time because it's >= 1950
+            value: new Date('1950-01-01T00:00:00Z')
+          }]
+        });
+        p7.sign();
+        var pem = PKCS7.messageToPem(p7);
+        ASSERT.equal(pem, _pem.signedDataWithAttrs1950UTCTime);
       });
-      p7.sign();
-      var pem = PKCS7.messageToPem(p7);
-      ASSERT.equal(pem, _pem.signedDataWithAttrs1950UTCTime);
-    });
 
-    it('should create PKCS#7 detached signature', function() {
+    it('should create PKCS#7 detached signature', function () {
       var p7 = PKCS7.createSignedData();
       p7.content = UTIL.createBuffer('To be signed.', 'utf8');
       p7.addCertificate(_pem.certificate);
@@ -731,44 +731,44 @@ var UTIL = require('../../lib/util');
           value: new Date('1950-01-01T00:00:00Z')
         }]
       });
-      p7.sign({detached: true});
+      p7.sign({ detached: true });
       var pem = PKCS7.messageToPem(p7);
       ASSERT.equal(pem, _pem.detachedSignature);
     });
 
-    it('should verify PKCS#7 signature w/o attributes', function() {
+    it('should verify PKCS#7 signature w/o attributes', function () {
       var p7 = PKCS7.messageFromPem(_pem.signedDataNoAttrs);
       var verified = p7.verify(PKI.createCaStore([_pem.certificate]), { validityCheckDate: new Date('2012-12-25T00:00:00Z') });
       ASSERT.equal(verified, true);
     });
 
-    it('should fail to verify bad PKCS#7 signature w/o attributes', function() {
+    it('should fail to verify bad PKCS#7 signature w/o attributes', function () {
       var p7 = PKCS7.messageFromPem(_pem.signedDataNoAttrsBadSig);
       var verified = p7.verify(PKI.createCaStore([_pem.certificate]), { validityCheckDate: new Date('2012-12-25T00:00:00Z') });
       ASSERT.equal(verified, false);
     });
 
-    it('should verify PKCS#7 signature w/attributes', function() {
+    it('should verify PKCS#7 signature w/attributes', function () {
       var p7 = PKCS7.messageFromPem(_pem.signedDataWithAttrs1950UTCTime);
       var verified = p7.verify(PKI.createCaStore([_pem.certificate]), { validityCheckDate: new Date('2012-12-25T00:00:00Z') });
       ASSERT.equal(verified, true);
     });
 
-    it('should verify PKCS#7 detached signature', function() {
+    it('should verify PKCS#7 detached signature', function () {
       var p7 = PKCS7.messageFromPem(_pem.detachedSignature);
       p7.content = UTIL.createBuffer('To be signed.', 'utf8');
       var verified = p7.verify(PKI.createCaStore([_pem.certificate]), { validityCheckDate: new Date('2012-12-25T00:00:00Z') });
       ASSERT.equal(verified, true);
     });
 
-    it('should fail to verify bad PKCS#7 detached signature', function() {
+    it('should fail to verify bad PKCS#7 detached signature', function () {
       var p7 = PKCS7.messageFromPem(_pem.detachedSignature);
       p7.content = UTIL.createBuffer('To be verified.', 'utf8');
       var verified = p7.verify(PKI.createCaStore([_pem.certificate]), { validityCheckDate: new Date('2012-12-25T00:00:00Z') });
       ASSERT.equal(verified, false);
     });
 
-    it('should callback with a status and certificate', function() {
+    it('should callback with a status and certificate', function () {
       var p7 = PKCS7.messageFromPem(_pem.detachedSignature);
       p7.content = UTIL.createBuffer('To be signed.', 'utf8');
       var callback = (err, res) => {
@@ -785,91 +785,91 @@ var UTIL = require('../../lib/util');
     });
 
     it('should create PKCS#7 SignedData with content-type, message-digest, ' +
-      'and signing-time attributes using UTCTime (2049)', function() {
-      // verify with:
-      // openssl smime -verify -in p7.pem -signer certificate.pem \
-      //   -out signedtext.txt -inform PEM -CAfile certificate.pem
-      var p7 = PKCS7.createSignedData();
-      p7.content = UTIL.createBuffer('To be signed.', 'utf8');
-      p7.addCertificate(_pem.certificate);
-      p7.addSigner({
-        key: PKI.privateKeyFromPem(_pem.privateKey),
-        certificate: _pem.certificate,
-        digestAlgorithm: PKI.oids.sha256,
-        authenticatedAttributes: [{
-          type: forge.pki.oids.contentType,
-          value: forge.pki.oids.data
-        }, {
-          type: forge.pki.oids.messageDigest
-          // value will be auto-populated at signing time
-        }, {
-          type: forge.pki.oids.signingTime,
-          // will be encoded as generalized time because it's before 2050
-          value: new Date('2049-12-31T23:59:59Z')
-        }]
+      'and signing-time attributes using UTCTime (2049)', function () {
+        // verify with:
+        // openssl smime -verify -in p7.pem -signer certificate.pem \
+        //   -out signedtext.txt -inform PEM -CAfile certificate.pem
+        var p7 = PKCS7.createSignedData();
+        p7.content = UTIL.createBuffer('To be signed.', 'utf8');
+        p7.addCertificate(_pem.certificate);
+        p7.addSigner({
+          key: PKI.privateKeyFromPem(_pem.privateKey),
+          certificate: _pem.certificate,
+          digestAlgorithm: PKI.oids.sha256,
+          authenticatedAttributes: [{
+            type: forge.pki.oids.contentType,
+            value: forge.pki.oids.data
+          }, {
+            type: forge.pki.oids.messageDigest
+            // value will be auto-populated at signing time
+          }, {
+            type: forge.pki.oids.signingTime,
+            // will be encoded as generalized time because it's before 2050
+            value: new Date('2049-12-31T23:59:59Z')
+          }]
+        });
+        p7.sign();
+        var pem = PKCS7.messageToPem(p7);
+        ASSERT.equal(pem, _pem.signedDataWithAttrs2049UTCTime);
       });
-      p7.sign();
-      var pem = PKCS7.messageToPem(p7);
-      ASSERT.equal(pem, _pem.signedDataWithAttrs2049UTCTime);
-    });
 
     it('should create PKCS#7 SignedData with content-type, message-digest, ' +
-      'and signing-time attributes using GeneralizedTime (2050)', function() {
-      // verify with:
-      // openssl smime -verify -in p7.pem -signer certificate.pem \
-      //   -out signedtext.txt -inform PEM -CAfile certificate.pem
-      var p7 = PKCS7.createSignedData();
-      p7.content = UTIL.createBuffer('To be signed.', 'utf8');
-      p7.addCertificate(_pem.certificate);
-      p7.addSigner({
-        key: PKI.privateKeyFromPem(_pem.privateKey),
-        certificate: _pem.certificate,
-        digestAlgorithm: PKI.oids.sha256,
-        authenticatedAttributes: [{
-          type: forge.pki.oids.contentType,
-          value: forge.pki.oids.data
-        }, {
-          type: forge.pki.oids.messageDigest
-          // value will be auto-populated at signing time
-        }, {
-          type: forge.pki.oids.signingTime,
-          // will be encoded as UTC time because it's >= 2050
-          value: new Date('2050-01-01T00:00:00Z')
-        }]
+      'and signing-time attributes using GeneralizedTime (2050)', function () {
+        // verify with:
+        // openssl smime -verify -in p7.pem -signer certificate.pem \
+        //   -out signedtext.txt -inform PEM -CAfile certificate.pem
+        var p7 = PKCS7.createSignedData();
+        p7.content = UTIL.createBuffer('To be signed.', 'utf8');
+        p7.addCertificate(_pem.certificate);
+        p7.addSigner({
+          key: PKI.privateKeyFromPem(_pem.privateKey),
+          certificate: _pem.certificate,
+          digestAlgorithm: PKI.oids.sha256,
+          authenticatedAttributes: [{
+            type: forge.pki.oids.contentType,
+            value: forge.pki.oids.data
+          }, {
+            type: forge.pki.oids.messageDigest
+            // value will be auto-populated at signing time
+          }, {
+            type: forge.pki.oids.signingTime,
+            // will be encoded as UTC time because it's >= 2050
+            value: new Date('2050-01-01T00:00:00Z')
+          }]
+        });
+        p7.sign();
+        var pem = PKCS7.messageToPem(p7);
+        ASSERT.equal(pem, _pem.signedDataWithAttrs2050GeneralizedTime);
       });
-      p7.sign();
-      var pem = PKCS7.messageToPem(p7);
-      ASSERT.equal(pem, _pem.signedDataWithAttrs2050GeneralizedTime);
-    });
 
     it('should create PKCS#7 SignedData with PEM-encoded private key',
-      function() {
-      // verify with:
-      // openssl smime -verify -in p7.pem -signer certificate.pem \
-      //   -out signedtext.txt -inform PEM -CAfile certificate.pem
-      var p7 = PKCS7.createSignedData();
-      p7.content = UTIL.createBuffer('To be signed.', 'utf8');
-      p7.addCertificate(_pem.certificate);
-      p7.addSigner({
-        key: _pem.privateKey,
-        certificate: _pem.certificate,
-        digestAlgorithm: PKI.oids.sha256,
-        authenticatedAttributes: [{
-          type: forge.pki.oids.contentType,
-          value: forge.pki.oids.data
-        }, {
-          type: forge.pki.oids.messageDigest
-          // value will be auto-populated at signing time
-        }, {
-          type: forge.pki.oids.signingTime,
-          // will be encoded as generalized time because it's before 1950
-          value: new Date('1949-12-31T23:59:59Z')
-        }]
+      function () {
+        // verify with:
+        // openssl smime -verify -in p7.pem -signer certificate.pem \
+        //   -out signedtext.txt -inform PEM -CAfile certificate.pem
+        var p7 = PKCS7.createSignedData();
+        p7.content = UTIL.createBuffer('To be signed.', 'utf8');
+        p7.addCertificate(_pem.certificate);
+        p7.addSigner({
+          key: _pem.privateKey,
+          certificate: _pem.certificate,
+          digestAlgorithm: PKI.oids.sha256,
+          authenticatedAttributes: [{
+            type: forge.pki.oids.contentType,
+            value: forge.pki.oids.data
+          }, {
+            type: forge.pki.oids.messageDigest
+            // value will be auto-populated at signing time
+          }, {
+            type: forge.pki.oids.signingTime,
+            // will be encoded as generalized time because it's before 1950
+            value: new Date('1949-12-31T23:59:59Z')
+          }]
+        });
+        p7.sign();
+        var pem = PKCS7.messageToPem(p7);
+        ASSERT.equal(pem, _pem.signedDataWithAttrs1949GeneralizedTime);
       });
-      p7.sign();
-      var pem = PKCS7.messageToPem(p7);
-      ASSERT.equal(pem, _pem.signedDataWithAttrs1949GeneralizedTime);
-    });
 
   });
 })();

@@ -1,7 +1,7 @@
 var forge = require('..');
 
-console.log('Generating 1024-bit key-pair...');
-var keys = forge.pki.rsa.generateKeyPair(1024);
+console.log('Generating 2048-bit key-pair...');
+var keys = forge.pki.rsa.generateKeyPair(2048);
 console.log('Key-pair created.');
 
 console.log('Creating certification request (CSR) ...');
@@ -55,12 +55,12 @@ console.log(pem.csr);
 
 // verify certification request
 try {
-  if(csr.verify()) {
+  if (csr.verify()) {
     console.log('Certification request (CSR) verified.');
   } else {
     throw new Error('Signature not verified.');
   }
-} catch(err) {
+} catch (err) {
   console.log('Certification request (CSR) verification failure: ' +
     JSON.stringify(err, null, 2));
 }

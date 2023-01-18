@@ -2,8 +2,8 @@ var forge = require('..');
 
 try {
   // generate a keypair
-  console.log('Generating 1024-bit key-pair...');
-  var keys = forge.pki.rsa.generateKeyPair(1024);
+  console.log('Generating 2048-bit key-pair...');
+  var keys = forge.pki.rsa.generateKeyPair(2048);
   console.log('Key-pair created.');
 
   // create a certificate
@@ -62,7 +62,7 @@ try {
   var password = 'password';
   var newPkcs12Asn1 = forge.pkcs12.toPkcs12Asn1(
     keys.privateKey, [cert], password,
-    {generateLocalKeyId: true, friendlyName: 'test'});
+    { generateLocalKeyId: true, friendlyName: 'test' });
   var newPkcs12Der = forge.asn1.toDer(newPkcs12Asn1).getBytes();
 
   console.log('\nBase64-encoded new PKCS#12:');
@@ -73,8 +73,8 @@ try {
 
   console.log('\nLoading new PKCS#12 to confirm...');
   loadPkcs12(newPkcs12Der, password, caStore);
-} catch(ex) {
-  if(ex.stack) {
+} catch (ex) {
+  if (ex.stack) {
     console.log(ex.stack);
   } else {
     console.log('Error', ex);
@@ -87,20 +87,20 @@ function loadPkcs12(pkcs12Der, password, caStore) {
 
   // load keypair and cert chain from safe content(s) and map to key ID
   var map = {};
-  for(var sci = 0; sci < pkcs12.safeContents.length; ++sci) {
+  for (var sci = 0; sci < pkcs12.safeContents.length; ++sci) {
     var safeContents = pkcs12.safeContents[sci];
     console.log('safeContents ' + (sci + 1));
 
-    for(var sbi = 0; sbi < safeContents.safeBags.length; ++sbi) {
+    for (var sbi = 0; sbi < safeContents.safeBags.length; ++sbi) {
       var safeBag = safeContents.safeBags[sbi];
       console.log('safeBag.type: ' + safeBag.type);
 
       var localKeyId = null;
-      if(safeBag.attributes.localKeyId) {
+      if (safeBag.attributes.localKeyId) {
         localKeyId = forge.util.bytesToHex(
           safeBag.attributes.localKeyId[0]);
         console.log('localKeyId: ' + localKeyId);
-        if(!(localKeyId in map)) {
+        if (!(localKeyId in map)) {
           map[localKeyId] = {
             privateKey: null,
             certChain: []
@@ -112,10 +112,10 @@ function loadPkcs12(pkcs12Der, password, caStore) {
       }
 
       // this bag has a private key
-      if(safeBag.type === forge.pki.oids.pkcs8ShroudedKeyBag) {
+      if (safeBag.type === forge.pki.oids.pkcs8ShroudedKeyBag) {
         console.log('found private key');
         map[localKeyId].privateKey = safeBag.key;
-      } else if(safeBag.type === forge.pki.oids.certBag) {
+      } else if (safeBag.type === forge.pki.oids.certBag) {
         // this bag has a certificate
         console.log('found certificate');
         map[localKeyId].certChain.push(safeBag.cert);
@@ -125,10 +125,10 @@ function loadPkcs12(pkcs12Der, password, caStore) {
 
   console.log('\nPKCS#12 Info:');
 
-  for(var localKeyId in map) {
+  for (var localKeyId in map) {
     var entry = map[localKeyId];
     console.log('\nLocal Key ID: ' + localKeyId);
-    if(entry.privateKey) {
+    if (entry.privateKey) {
       var privateKeyP12Pem = forge.pki.privateKeyToPem(entry.privateKey);
       var encryptedPrivateKeyP12Pem = forge.pki.encryptRsaPrivateKey(
         entry.privateKey, password);
@@ -140,10 +140,10 @@ function loadPkcs12(pkcs12Der, password, caStore) {
     } else {
       console.log('');
     }
-    if(entry.certChain.length > 0) {
+    if (entry.certChain.length > 0) {
       console.log('Certificate chain:');
       var certChain = entry.certChain;
-      for(var i = 0; i < certChain.length; ++i) {
+      for (var i = 0; i < certChain.length; ++i) {
         var certP12Pem = forge.pki.certificateToPem(certChain[i]);
         console.log(certP12Pem);
       }
@@ -151,7 +151,7 @@ function loadPkcs12(pkcs12Der, password, caStore) {
       var chainVerified = false;
       try {
         chainVerified = forge.pki.verifyCertificateChain(caStore, certChain);
-      } catch(ex) {
+      } catch (ex) {
         chainVerified = ex;
       }
       console.log('Certificate chain verified: ', chainVerified);

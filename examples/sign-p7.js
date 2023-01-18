@@ -5,7 +5,7 @@ try {
   var p7 = forge.pkcs7.createSignedData();
   p7.content = forge.util.createBuffer('Some content to be signed.', 'utf8');
   var signers = ['a', 'b'];
-  for(var i = 0; i < signers.length; ++i) {
+  for (var i = 0; i < signers.length; ++i) {
     var signer = createSigner(signers[i]);
     p7.addCertificate(signer.certificate);
     p7.addSigner({
@@ -30,8 +30,8 @@ try {
 
   var pem = forge.pkcs7.messageToPem(p7);
   console.log('Signed PKCS #7 message:\n' + pem);
-} catch(ex) {
-  if(ex.stack) {
+} catch (ex) {
+  if (ex.stack) {
     console.log(ex.stack);
   } else {
     console.log('Error', ex);
@@ -42,8 +42,8 @@ function createSigner(name) {
   console.log('Creating signer "' + name + '"...');
 
   // generate a keypair
-  console.log('Generating 1024-bit key-pair...');
-  var keys = forge.pki.rsa.generateKeyPair(1024);
+  console.log('Generating 2048-bit key-pair...');
+  var keys = forge.pki.rsa.generateKeyPair(2048);
   console.log('Key-pair created:');
   console.log(forge.pki.privateKeyToPem(keys.privateKey));
   console.log(forge.pki.publicKeyToPem(keys.publicKey));

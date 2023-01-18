@@ -1,7 +1,7 @@
 var forge = require('..');
 
-console.log('Generating 1024-bit key-pair...');
-var keys = forge.pki.rsa.generateKeyPair(1024);
+console.log('Generating 2048-bit key-pair...');
+var keys = forge.pki.rsa.generateKeyPair(2048);
 console.log('Key-pair created.');
 
 console.log('Creating self-signed certificate...');
@@ -96,15 +96,15 @@ var caStore = forge.pki.createCaStore();
 caStore.addCertificate(cert);
 try {
   forge.pki.verifyCertificateChain(caStore, [cert],
-    function(vfd, depth, chain) {
-      if(vfd === true) {
+    function (vfd, depth, chain) {
+      if (vfd === true) {
         console.log('SubjectKeyIdentifier verified: ' +
           cert.verifySubjectKeyIdentifier());
         console.log('Certificate verified.');
       }
       return true;
     });
-} catch(ex) {
+} catch (ex) {
   console.log('Certificate verification failure: ' +
     JSON.stringify(ex, null, 2));
 }
